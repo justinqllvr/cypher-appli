@@ -170,7 +170,7 @@ export default class GoogleApi {
     }
   };
 
-  getBlobs = async () => {
+  getVideos = async () => {
 
     console.log("in get Blobs")
     let response;
