@@ -48,7 +48,7 @@ export default class Server {
     
     // console.log(this.videos[this.videoIndex])
     // console.log(this.videoIndex)
-    await app.GoogleApi.uploadVideo(blobVideo, video.id);
+    await app.GoogleApi.uploadVideo(this.videos[this.videoIndex], video.id);
 
     // app.GoogleApi.createFile('testDeFichier')
 

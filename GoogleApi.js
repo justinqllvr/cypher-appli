@@ -115,24 +115,24 @@ export default class GoogleApi {
   }
 
   uploadVideo = async (video, id) => {
-    try {
-      console.log("in upload video");
-      console.log(video)
-     
-      const params = {
-        parents: [this.mainFolderId],
-        fields: "id",
-        name: id,
-        media: {
-          body: video.stream(),
-        },
-      };
-
-      const response = await gapi.client.drive.files.create(params);
-      console.log("Video uploaded successfully : ", response.result);
-    } catch (error) {
-      console.log("An error occured :", error);
+    let data = new FormData()
+    let metadata = {
+      name: id,
+      mimeType: "video/mp4",
+      parents: [this.mainFolderId],
     }
+    data.append("metadata", new Blob([JSON.stringify(metadata)], {type: "application/json"}))
+    data.append("file", new Blob([video], {type: "video/mp4"}))
+
+    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+      method: "POST",
+      headers: new Headers({
+        Authorization: "Bearer " + gapi.auth.getToken().access_token,
+      }),
+      body: data,
+    }).then((response) => {
+      console.log(response);
+    });
   };
 
   testData = (blob) => {
