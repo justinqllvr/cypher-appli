@@ -12,7 +12,7 @@ export default class Server {
   constructor() {
     this.connect();
     this.bodyEl = document.querySelector("body");
-    this.videos = [];
+    this.videos = new Map();
     this.buffers = new Map();
     this.videoIndex = 0;
   }
@@ -33,8 +33,9 @@ export default class Server {
     }
 
     this.mergeVideos();
+    console.log(this.videos, this.videos.get(video.id), video.id);
 
-    const blobVideo = new Blob([this.videos[this.videoIndex]], { type: "video/mp4" });
+    const blobVideo = new Blob([this.videos.get(video.id)], { type: "video/mp4" });
     const videoUrl = URL.createObjectURL(blobVideo);
 
     const videoEl = `<video src=${videoUrl} controls="true"></video>`
@@ -48,7 +49,8 @@ export default class Server {
     
     // console.log(this.videos[this.videoIndex])
     // console.log(this.videoIndex)
-    await app.GoogleApi.uploadVideo(this.videos[this.videoIndex], video.id);
+    if (!this.videos.has(video.id)) return;
+    await app.GoogleApi.uploadVideo(this.videos.get(video.id), video.id);
 
     // app.GoogleApi.createFile('testDeFichier')
 
@@ -56,14 +58,12 @@ export default class Server {
 
     this.bodyEl.innerHTML = videoEl;
 
-
-    this.videoIndex++
   };
 
   mergeVideos() {
     this.buffers.forEach((videos, id) => {
       if (videos.length === videos[0].length) {
-        this.videos.push(
+        this.videos.set(id,
           videos
             .sort((a, b) => a.index - b.index)
             .map((video) => video.buffer)
