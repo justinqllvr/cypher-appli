@@ -97,6 +97,7 @@ export default class GoogleApi {
         fields: "files(id, name, createdTime)",
         spaces: "drive",
       });
+      console.log(response)
     } catch (err) {
       console.log(err.message);
       return;
