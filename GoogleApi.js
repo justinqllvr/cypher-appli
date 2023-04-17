@@ -17,7 +17,8 @@ export default class GoogleApi {
     this.API_KEY = "AIzaSyDh-p12fJ1fMAe65ltitJxKi_RRedVasYU";
     this.CLIENT_ID =
       "506410782248-ia4icje24v66kiqlboae43qo11qbk435.apps.googleusercontent.com";
-    this.SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly";
+    this.SCOPES =
+      "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly";
     this.DISCOVERY_DOC =
       "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
   }
@@ -97,7 +98,7 @@ export default class GoogleApi {
         fields: "files(id, name, createdTime)",
         spaces: "drive",
       });
-      console.log(response)
+      // console.log(response)
     } catch (err) {
       console.log(err.message);
       return;
@@ -116,23 +117,29 @@ export default class GoogleApi {
   }
 
   uploadVideo = async (video, id) => {
-    let data = new FormData()
+    let data = new FormData();
     let metadata = {
       name: id,
       mimeType: "video/mp4",
       parents: [this.mainFolderId],
-    }
-    data.append("metadata", new Blob([JSON.stringify(metadata)], {type: "application/json"}))
-    data.append("file", new Blob([video], {type: "video/mp4"}))
+    };
+    data.append(
+      "metadata",
+      new Blob([JSON.stringify(metadata)], { type: "application/json" })
+    );
+    data.append("file", new Blob([video], { type: "video/mp4" }));
 
-    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
-      method: "POST",
-      headers: new Headers({
-        Authorization: "Bearer " + gapi.auth.getToken().access_token,
-      }),
-      body: data,
-    }).then((response) => {
-      console.log(response);
+    fetch(
+      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+      {
+        method: "POST",
+        headers: new Headers({
+          Authorization: "Bearer " + gapi.auth.getToken().access_token,
+        }),
+        body: data,
+      }
+    ).then((response) => {
+      // console.log(response);
     });
   };
 
@@ -170,45 +177,78 @@ export default class GoogleApi {
     }
   };
 
-  getVideos = async () => {
-
-    console.log("in get Blobs")
+  getVideoList = async () => {
     let response;
 
     try {
       response = await gapi.client.drive.files.list({
         q: `'${this.mainFolderId}' in parents and trashed=false`,
-        // fields: "files(id)",
         spaces: "Drive",
       });
 
-      console.log(response)
-
-      this.getSingleBlob(response.result.files[0].id)
+      return response.result.files;
     } catch (err) {
       console.log(err.message);
       return;
     }
-  }
+  };
 
-  getSingleBlob = async (id) => {
+  getSingleArrayBuffer = async (id) => {
+    // this.getSingleArrayBuffer(response.result.files[0].id)
+
     let response;
 
-    console.log('in Single blob')
     // console.log(id)
 
     try {
-      response = await gapi.client.drive.files.get({
-        fileId: id,
-        // alt: "application/octet-stream",
-      });
+      response = await gapi.client.drive.files
+        .get({
+          fileId: id,
+          alt: "media",
+        })
+  
 
-      console.log(response)
+         
+
+        const videoArrayBuffer = this.base64ToArrayBuffer(
+          window.btoa(response.body)
+        );
+
+        return videoArrayBuffer
+
+         const dataUrl =
+            "data:" +
+            res.headers["Content-Type"] +
+            ";base64," +
+            window.btoa(res.body);
+
+
+
     } catch (err) {
       console.log(err);
       return;
     }
-  }
+  };
+
+  base64ToArrayBuffer = (base64) => {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    let bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+      bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  };
+
+  arrayBufferToBase64( buffer ) {
+    let binary = '';
+    const bytes = new Uint8Array( buffer );
+    const len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
 }
 
 // export default new GoogleApi();

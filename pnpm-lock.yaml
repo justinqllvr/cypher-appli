@@ -1,10 +1,12 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@types/gapi.drive': ^0.0.3
   socket.io-client: ^4.6.1
   vite: ^4.1.0
 
 dependencies:
+  '@types/gapi.drive': 0.0.3
   socket.io-client: 4.6.1
 
 devDependencies:
@@ -212,6 +214,16 @@ packages:
 
   /@socket.io/component-emitter/3.1.0:
     resolution: {integrity: sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==}
+    dev: false
+
+  /@types/gapi.drive/0.0.3:
+    resolution: {integrity: sha512-71lQkx63gT11iArRVrpVxaRxIXYx732TdWcu5xenzcKRyWR8XADjdeARxjiFJ5hBQq23YBfp643ADNcaEgZ92A==}
+    dependencies:
+      '@types/gapi': 0.0.44
+    dev: false
+
+  /@types/gapi/0.0.44:
+    resolution: {integrity: sha512-hsgJMfZ/pMwI15UlAYHMNwj8DRoigo1odhbPwEXdp19ZQwQAXbcRrpzaDsfc+9XM6RtGpvl4Ja7uW8A+KPCa7w==}
     dev: false
 
   /debug/4.3.4:
