@@ -35,4 +35,14 @@ export default class DropBoxApi {
         console.error(error);
       });
   }
+
+  uploadVideo(id, file) {
+    this.dropbox.filesUpload({path: '/cypher/solo/' + id + '.mp4', contents: file})
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(error) {
+      console.error(error);
+    });
+  }
 }

@@ -37,13 +37,29 @@ export default class Server {
 
     const videoBuffer = this.mergeVideoBuffers(video.id);
 
+    app.dropbox.uploadVideo(video.id, videoBuffer);
+
     // TODO: Upload solo video to solo Drive
     // TODO: Download 5 last solo videos from solo Drive
     // TODO: Merge solos videos in 1 final video
     // TODO: Upload final video to final Drive
     // TODO: Show video to UI
 
-    const buffers = Array(3).fill(videoBuffer);
+    // this.mergeVideos(videoBuffer);
+  };
+
+  mergeVideoBuffers(id) {
+    const buffers = this.buffers.get(id)
+    const mergedBuffer = buffers
+      .sort((a, b) => a.index - b.index)
+      .map((video) => video.buffer)
+      .reduce((a, b) => mergeBuffers(a, b), new Uint8Array())
+    this.buffers.delete(id);
+    return mergedBuffer;
+  }
+
+  async mergeVideos(exampleBuffer) {
+    const buffers = Array(3).fill(exampleBuffer);
     
     await this.ffmpeg.load();
     const tempFiles = buffers.map((video, i) => {
@@ -64,15 +80,5 @@ export default class Server {
     videoEl.src = src;
     videoEl.controls = true;
     this.bodyEl.appendChild(videoEl);
-  };
-
-  mergeVideoBuffers(id) {
-    const buffers = this.buffers.get(id)
-    const mergedBuffer = buffers
-      .sort((a, b) => a.index - b.index)
-      .map((video) => video.buffer)
-      .reduce((a, b) => mergeBuffers(a, b), new Uint8Array())
-    this.buffers.delete(id);
-    return mergedBuffer;
   }
 }

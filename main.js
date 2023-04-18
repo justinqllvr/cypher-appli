@@ -6,17 +6,9 @@ class App {
   static instance;
   
   constructor() {
-    this.init();
-  }
-
-  init() {
-    // this.GoogleApi = new GoogleApi();
-    new DropBoxApi()
-  }
-
-  async initServer() {
+    this.dropbox = new DropBoxApi()
     this.server = new Server();
-    console.log("ready to work :D")
+    console.log("ready to work :3")
   }
 
   static getInstance() {
