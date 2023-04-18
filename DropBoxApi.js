@@ -7,7 +7,6 @@ export default class DropBoxApi {
 
   init() {
     //Connexion to dropbox
-    console.log();
     const ACCESS_TOKEN = import.meta.env.VITE_DROPBOX_KEY;
     this.dropbox = new Dropbox({ accessToken: ACCESS_TOKEN });
     console.log(this.dropbox);
