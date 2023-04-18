@@ -1,12 +1,10 @@
 import "./style.css";
-import GoogleApi from "./GoogleApi.js";
 import Server from "./server.js";
 import DropBoxApi from "./DropBoxApi";
 
 class App {
   static instance;
   
-
   constructor() {
     this.init();
   }
@@ -17,7 +15,7 @@ class App {
   }
 
   async initServer() {
-    this.server = await new Server();
+    this.server = new Server();
     console.log("ready to work :D")
   }
 
