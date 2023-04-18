@@ -25,7 +25,7 @@ export default class GoogleApi {
 
   //Load 2 Google APIS
   init() {
-    console.log("init GoogleApi");
+    // console.log("init GoogleApi");
     this.loadScript("https://apis.google.com/js/api.js", this.gapiLoaded);
     this.loadScript("https://accounts.google.com/gsi/client", this.gisLoaded);
   }
@@ -42,20 +42,24 @@ export default class GoogleApi {
   gapiLoaded = () => {
     gapi.load("client", async () => {
       await gapi.client.init({
-        apiKey: this.API_KEY,
+        // apiKey: this.API_KEY,
+        clientId: this.CLIENT_ID,
         discoveryDocs: [this.DISCOVERY_DOC],
+        scope: this.SCOPES,
       });
-      this.gapiInited = true;
-      this.maybeEnableButtons();
+      gapi.auth2.getAuthInstance().signIn()
+      console.log(gapi);
+      // this.gapiInited = true;
+      // this.maybeEnableButtons();
     });
   };
 
   gisLoaded = () => {
-    this.tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: this.CLIENT_ID,
-      scope: this.SCOPES,
-      callback: "", // defined later
-    });
+    // this.tokenClient = google.accounts.oauth2.initTokenClient({
+    //   client_id: this.CLIENT_ID,
+    //   scope: this.SCOPES,
+    //   callback: "", // defined later
+    // });
     this.gisInited = true;
     this.maybeEnableButtons();
   };
@@ -111,7 +115,7 @@ export default class GoogleApi {
   }
 
   emitInitEnded() {
-    console.log("Initi ended");
+    // console.log("Initi ended");
     app.initServer();
     // this.createFile();
   }
@@ -149,7 +153,7 @@ export default class GoogleApi {
 
   createFile = async (name) => {
     try {
-      console.log("in Create File");
+      // console.log("in Create File");
       //     console.log("createFile")
       //   const params = {
       //     metadata: {
@@ -201,29 +205,22 @@ export default class GoogleApi {
     // console.log(id)
 
     try {
-      response = await gapi.client.drive.files
-        .get({
-          fileId: id,
-          alt: "media",
-        })
-  
+      response = await gapi.client.drive.files.get({
+        fileId: id,
+        alt: "media",
+      });
 
-         
+      const videoArrayBuffer = this.base64ToArrayBuffer(
+        window.btoa(response.body)
+      );
 
-        const videoArrayBuffer = this.base64ToArrayBuffer(
-          window.btoa(response.body)
-        );
+      return videoArrayBuffer;
 
-        return videoArrayBuffer
-
-         const dataUrl =
-            "data:" +
-            res.headers["Content-Type"] +
-            ";base64," +
-            window.btoa(res.body);
-
-
-
+      const dataUrl =
+        "data:" +
+        res.headers["Content-Type"] +
+        ";base64," +
+        window.btoa(res.body);
     } catch (err) {
       console.log(err);
       return;
@@ -240,15 +237,15 @@ export default class GoogleApi {
     return bytes.buffer;
   };
 
-  arrayBufferToBase64( buffer ) {
-    let binary = '';
-    const bytes = new Uint8Array( buffer );
+  arrayBufferToBase64(buffer) {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
     const len = bytes.byteLength;
     for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
+      binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa( binary );
-}
+    return window.btoa(binary);
+  }
 }
 
 // export default new GoogleApi();

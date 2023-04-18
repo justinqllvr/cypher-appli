@@ -1,9 +1,8 @@
 import { io } from "socket.io-client";
 import { app } from "./main.js";
-import { FFmpeg } from "https://taisukef.github.io/ffmpeg.es.js/ffmpeg.es.js";
+import { createFFmpeg } from "@ffmpeg/ffmpeg";
 
 const mergeBuffers = (buffer1, buffer2) => {
-  console.log(buffer1);
   var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
   tmp.set(new Uint8Array(buffer1), 0);
   tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
@@ -13,10 +12,10 @@ const mergeBuffers = (buffer1, buffer2) => {
 export default class Server {
   constructor() {
     this.connect();
+    this.ffmpeg = createFFmpeg({ log: true });
+
     this.bodyEl = document.querySelector("body");
-    this.videos = new Map();
     this.buffers = new Map();
-    this.videoIndex = 0;
   }
 
   connect() {
@@ -24,182 +23,56 @@ export default class Server {
       transports: ["websocket", "polling", "flashsocket"],
     });
 
-    this.socket.on("VIDEO_CREATED", this.handleNewVideo);
+    this.socket.on("VIDEO_CREATED", this.handleNewBuffer);
   }
 
-  handleNewVideo = async (video) => {
-    console.log("new Video handled !");
+  handleNewBuffer = async (video) => {
     if (this.buffers.has(video.id)) {
       this.buffers.get(video.id).push(video);
     } else {
       this.buffers.set(video.id, [video]);
     }
 
-    //Si toutes les vidéos ne sont pas arrivées, return nothing
-    this.mergeVideos();
-    if (!this.videos.has(video.id)) return;
+    if (video.length > video.index + 1) return;
 
-    //Si elles sont toutes arrivées, faire le montage vidéo et upload la vidéo
-    this.createCustomVideo(this.videos.get(video.id));
+    const videoBuffer = this.mergeVideoBuffers(video.id);
 
-    //Upload de la video
-    await app.GoogleApi.uploadVideo(this.videos.get(video.id), video.id);
+    // TODO: Upload solo video to solo Drive
+    // TODO: Download 5 last solo videos from solo Drive
+    // TODO: Merge solos videos in 1 final video
+    // TODO: Upload final video to final Drive
+    // TODO: Show video to UI
 
-    // console.log(this.videos, this.videos.get(video.id), video.id);
-
-    // console.log(this.videos)
-    // await app.GoogleApi.uploadVideo(this.videos.map((video) => {
-    //     return new Blob([video], {type: "video/mp4"})
-    // }));
-
-    // console.log(this.videos[this.videoIndex])
-    // console.log(this.videoIndex)
-  };
-
-  mergeVideos() {
-    this.buffers.forEach((videos, id) => {
-      if (videos.length === videos[0].length) {
-        this.videos.set(
-          id,
-          videos
-            .sort((a, b) => a.index - b.index)
-            .map((video) => video.buffer)
-            .reduce((a, b) => mergeBuffers(a, b), new Uint8Array())
-        );
-        this.buffers.delete(id);
-      }
-    });
-  }
-
-  createCustomVideo = async (arrayBufferVideo) => {
-    console.log("generating video");
-    const arrayBufferList = [];
-
-    const videoList = await app.GoogleApi.getVideoList();
-
-    //Waiting for all buffers
-    await Promise.all(
-      videoList.map(async (video) => {
-        const arrayBuffer = await app.GoogleApi.getSingleArrayBuffer(video.id);
-        arrayBufferList.push(arrayBuffer);
-      })
-    );
-
-    //Merge buffers into one video
-    // const videoUrl = await this.mergeArrayBufferInVideo(arrayBufferVideo, arrayBufferList[0]);
-
-    const blobVideo1 = new Blob([arrayBufferList[0]], { type: "video/mp4" });
-    const blobVideo2 = new Blob([arrayBufferList[2]], { type: "video/mp4" });
-
-    const videoUrl1 = URL.createObjectURL(blobVideo1);
-    const videoUrl2 = URL.createObjectURL(blobVideo2);
-
-    const videoEl = document.createElement("video");
-    const mediaSource = new MediaSource();
-    console.log(mediaSource)
-
-    // écouteur d'événement pour quand la source est ouverte
-    mediaSource.addEventListener("sourceopen", async () => {
-      // création d'un flux source et ajout des deux segments vidéo
-        
-      const sourceBuffer = mediaSource.addSourceBuffer('');
-      await fetch(videoUrl1)
-        .then((response) => response.arrayBuffer())
-        .then((data) => sourceBuffer.appendBuffer(data));
-      await fetch(videoUrl2)
-        .then((response) => response.arrayBuffer())
-        .then((data) => {sourceBuffer.appendBuffer(data), console.log('infetch')});
-
-        console.log(mediaSource)
+    const buffers = Array(3).fill(videoBuffer);
+    
+    await this.ffmpeg.load();
+    const tempFiles = buffers.map((video, i) => {
+      this.ffmpeg.FS("writeFile", `temp_${i}.mp4`, new Uint8Array(video))
+      return `temp_${i}.mp4`;
     });
 
-    console.log("before mediasource")
-
-    const mergedVideoUrl = URL.createObjectURL(mediaSource);
-    // mise à jour de l'élément vidéo pour lire la vidéo fusionnée
-    videoEl.src = mergedVideoUrl;
-    videoEl.controls = true;
-
-    // ajout de l'élément vidéo au DOM
-    this.bodyEl.appendChild(videoEl);
-
-    // let finalBuffer = mergeBuffers(arrayBufferList[0], arrayBufferList[1]);
-    // console.log(arrayBufferList[0]);
-    // console.log(arrayBufferList[1]);
-    // console.log(finalBuffer);
-
-    // console.log(arrayBufferList);
-
-    // const blobVideo = new Blob([finalBuffer], { type: "video/mp4" });
-    // const videoUrl = URL.createObjectURL(blobVideo);
-
-    // const videoEl = `<video src=${videoUrl} controls="true"></video>`;
-
-    // this.bodyEl.innerHTML = videoEl;
-
-    //Crop la vidéo grâce à ffsjpeg
-  };
-
-  mergeArrayBufferInVideo = async (buffer1, buffer2) => {
-    const { createFFmpeg } = FFmpeg;
-    const ffmpeg = createFFmpeg({
-      log: true,
-      progress: ({ ratio }) => {
-        // console.log(`Progress: ${ratio}`);
-      },
-    });
-
-    console.log(ffmpeg);
-
-    // Démarrer FFmpeg
-    await ffmpeg.load();
-
-    // Convertir la première vidéo en images
-    await ffmpeg.FS("writeFile", "video1.mp4", new Uint8Array(buffer1));
-    await ffmpeg.run("-i", "video1.mp4", "video1-%d.png");
-
-    // Convertir la deuxième vidéo en images
-    await ffmpeg.FS("writeFile", "video2.mp4", new Uint8Array(buffer2));
-    await ffmpeg.run("-i", "video2.mp4", "video2-%d.png");
-
-    // Fusionner les tableaux d'images
-    const mergedImages = [];
-    let numImages = 0;
-    while (true) {
-      const image1 = await ffmpeg.FS("readFile", `video1-${numImages}.png`);
-      const image2 = await ffmpeg.FS("readFile", `video2-${numImages}.png`);
-      if (image1 && image2) {
-        mergedImages.push(image1);
-        mergedImages.push(image2);
-      } else if (image1) {
-        mergedImages.push(image1);
-      } else if (image2) {
-        mergedImages.push(image2);
-      } else {
-        break;
-      }
-      numImages++;
+    const inputPaths = [];
+    for (const file of tempFiles) {
+      inputPaths.push(`file ${file}`);
     }
+    this.ffmpeg.FS('writeFile', 'concat_list.txt', inputPaths.join('\n'));
+    await this.ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'concat_list.txt', 'output.mp4');
 
-    // Fusionner les images en une seule vidéo
-    await ffmpeg.FS("writeFile", "merged.mp4", new Uint8Array(mergedImages));
-    await ffmpeg.run(
-      "-i",
-      "merged-%d.png",
-      "-y",
-      "-vcodec",
-      "libx264",
-      "-pix_fmt",
-      "yuv420p",
-      "-crf",
-      "23",
-      "merged.mp4"
-    );
-
-    return URL.createObjectURL(new Blob([ffmpeg.FS("readFile", "merged.mp4")]));
+    const blob = new Blob([this.ffmpeg.FS('readFile', 'output.mp4')], { type: 'video/mp4' })
+    const src = URL.createObjectURL(blob);
+    const videoEl = document.createElement('video');
+    videoEl.src = src;
+    videoEl.controls = true;
+    this.bodyEl.appendChild(videoEl);
   };
 
-  joinVideo() {
-    //Création d'une source pour lier les deux vidéos
+  mergeVideoBuffers(id) {
+    const buffers = this.buffers.get(id)
+    const mergedBuffer = buffers
+      .sort((a, b) => a.index - b.index)
+      .map((video) => video.buffer)
+      .reduce((a, b) => mergeBuffers(a, b), new Uint8Array())
+    this.buffers.delete(id);
+    return mergedBuffer;
   }
 }
