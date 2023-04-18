@@ -37,13 +37,15 @@ export default class Server {
 
     const videoBuffer = this.mergeVideoBuffers(video.id);
 
+    app.dropbox.uploadVideo(video.id, videoBuffer);
+
     // TODO: Upload solo video to solo Drive
     // TODO: Download 5 last solo videos from solo Drive
     // TODO: Merge solos videos in 1 final video
     // TODO: Upload final video to final Drive
     // TODO: Show video to UI
 
-    this.mergeVideos(videoBuffer);
+    // this.mergeVideos(videoBuffer);
   };
 
   mergeVideoBuffers(id) {
