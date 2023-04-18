@@ -4,6 +4,7 @@ specifiers:
   '@ffmpeg/core': ^0.11.0
   '@ffmpeg/ffmpeg': ^0.11.6
   '@types/gapi.drive': ^0.0.3
+  dropbox: ^10.34.0
   socket.io-client: ^4.6.1
   vite: ^4.1.0
 
@@ -11,6 +12,7 @@ dependencies:
   '@ffmpeg/core': 0.11.0
   '@ffmpeg/ffmpeg': 0.11.6
   '@types/gapi.drive': 0.0.3
+  dropbox: 10.34.0
   socket.io-client: 4.6.1
 
 devDependencies:
@@ -256,6 +258,17 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
+    dev: false
+
+  /dropbox/10.34.0:
+    resolution: {integrity: sha512-5jb5/XzU0fSnq36/hEpwT5/QIep7MgqKuxghEG44xCu7HruOAjPdOb3x0geXv5O/hd0nHpQpWO+r5MjYTpMvJg==}
+    engines: {node: '>=0.10.3'}
+    peerDependencies:
+      '@types/node-fetch': ^2.5.7
+    dependencies:
+      node-fetch: 2.6.9
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /engine.io-client/6.4.0:
