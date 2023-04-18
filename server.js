@@ -88,32 +88,57 @@ export default class Server {
     //Merge buffers into one video
     // const videoUrl = await this.mergeArrayBufferInVideo(arrayBufferVideo, arrayBufferList[0]);
 
-    const blobVideo1 = new Blob([arrayBufferList[0]], { type: "video/mp4" });
-    const blobVideo2 = new Blob([arrayBufferList[2]], { type: "video/mp4" });
+    const blobVideo1 = new Blob([arrayBufferList[0]], {
+      type: "video/mp4; codecs=avc1.42E01E, mp4a.40.2",
+    });
+    const blobVideo2 = new Blob([arrayBufferList[1]], {
+      type: "video/mp4; codecs=avc1.42E01E, mp4a.40.2",
+    });
 
     const videoUrl1 = URL.createObjectURL(blobVideo1);
     const videoUrl2 = URL.createObjectURL(blobVideo2);
 
     const videoEl = document.createElement("video");
     const mediaSource = new MediaSource();
-    console.log(mediaSource)
+    console.log(mediaSource);
 
     // écouteur d'événement pour quand la source est ouverte
     mediaSource.addEventListener("sourceopen", async () => {
+      console.log("in");
       // création d'un flux source et ajout des deux segments vidéo
-        
-      const sourceBuffer = mediaSource.addSourceBuffer('');
-      await fetch(videoUrl1)
-        .then((response) => response.arrayBuffer())
-        .then((data) => sourceBuffer.appendBuffer(data));
-      await fetch(videoUrl2)
-        .then((response) => response.arrayBuffer())
-        .then((data) => {sourceBuffer.appendBuffer(data), console.log('infetch')});
 
-        console.log(mediaSource)
+      const sourceBuffer = mediaSource.addSourceBuffer(
+        "video/mp4; codecs=avc1.42E01E, mp4a.40.2"
+      );
+
+      const response1 = await fetch(videoUrl1);
+      const data1 = await response1.arrayBuffer();
+      sourceBuffer.appendBuffer(data1);
+
+      console.log(sourceBuffer)
+
+      // const response2 = await fetch(videoUrl2);
+      // const data2 = await response2.arrayBuffer();
+      // sourceBuffer.appendBuffer(data2);
+
+      const mergedVideoUrl = URL.createObjectURL(mediaSource);
+      // mise à jour de l'élément vidéo pour lire la vidéo fusionnée
+      videoEl.src = mergedVideoUrl;
+      videoEl.controls = true;
+
+      // ajout de l'élément vidéo au DOM
+      document.body.appendChild(videoEl);
+
+      // fetch(videoUrl1)
+      //   .then((response) => response.arrayBuffer())
+      //   .then(
+      //     (data) => console.log(data)
+      //     // sourceBuffer.appendBuffer(data)
+      //   );
+      // fetch(videoUrl2)
+      //   .then((response) => response.arrayBuffer())
+      //   .then((data) => sourceBuffer.appendBuffer(data));
     });
-
-    console.log("before mediasource")
 
     const mergedVideoUrl = URL.createObjectURL(mediaSource);
     // mise à jour de l'élément vidéo pour lire la vidéo fusionnée

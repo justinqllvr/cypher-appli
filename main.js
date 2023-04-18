@@ -1,6 +1,7 @@
 import "./style.css";
 import GoogleApi from "./GoogleApi.js";
 import Server from "./server.js";
+import DropBoxApi from "./DropBoxApi";
 
 class App {
   static instance;
@@ -11,9 +12,8 @@ class App {
   }
 
   init() {
-    console.log( MediaSource.isTypeSupported('video/mp4; codecs="avc1.64001E"'))
-
-    this.GoogleApi = new GoogleApi();
+    // this.GoogleApi = new GoogleApi();
+    new DropBoxApi()
   }
 
   async initServer() {
