@@ -8,7 +8,7 @@ class App {
   constructor() {
     this.dropbox = new DropBoxApi()
     this.server = new Server();
-    console.log("ready to work :3")
+    console.log("ready to work U_w_U")
   }
 
   static getInstance() {
