@@ -12,12 +12,13 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 
 
 body {
-  margin: 5vw;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -32,4 +33,38 @@ video {
   margin: 3vw;
 }
 
+form {
+  visibility: hidden;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vw;
+  opacity: 0;
+  transition: .5s;
+  transition-property: opacity;
+  position: absolute;
+  background-color: #242424;
+  left: 0;
+  top: 0;
+  height: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
+#mail:valid {
+  background-color: green;
+}
+
+#leave {
+  position: absolute;
+  right: 5rem;
+  top: 5rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

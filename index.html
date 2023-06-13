@@ -8,8 +8,17 @@
 </head>
 
 <body>
-  <button id="authorize_button">Authorize</button>
   <pre id="content" style="white-space: pre-wrap;"></pre>
+  <form id="form">
+    <div class="form-example">
+      <label for="email">Récupère ta vidéo par mail :</label>
+      <input id="mail" type="email" id="email" placeholder="john@exemple.com" required>
+    </div>
+    <div class="form-example">
+      <input id="submit" type="submit" value="Envoyer !">
+    </div>
+    <button id="leave">Quitter</button>
+  </form>
 </body>
 
 <script type="module" src="/main.js"></script>
