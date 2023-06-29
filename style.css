@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #000000;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,39 +13,108 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+
+  --yellow: #FFC700;
+  --white: #FFFFFFEB;
+  --grey: #D9D9D9;
+  --black:#000000; 
 }
 
+@font-face {
+	font-family: 'Anton';
+	src: url('./assets/fonts/Anton.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+} 
 
+@font-face {
+	font-family: 'Aventa';
+	src: url('./assets/fonts/Aventa_light.otf');
+	font-weight: normal;
+	font-style: normal;
+} 
 
 body {
   margin: 0;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  flex-direction: column;
+  width: 100vw;
+  /* min-height: 100vh; */
 }
 
-video {
-  width: 32vw;
-  height: 18vw;
-  margin: 3vw;
+input {
+  all: unset;
 }
 
-form {
+.title {
+  color: var(--yellow);
+  font-family: 'Anton';
+  font-size: 83.651px;
+  display: flex;
+  align-items: center;
+  margin-top: 5vh;
+}
+
+h1 {
+  margin: 0;
+}
+
+.circle {
+  transform: translateX(-90%);
+  z-index: -1;
+}
+
+.videos-container {
+  width: 80%;
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 35px;
+  cursor: pointer;
+}
+
+.container, .clone-container {
+  border-radius: 30px;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  height: 450px;
+}
+
+.id {
+  position: absolute;
+  right: 17px;
+  top: 20px;
+  color: var(--black);
+  padding: 5px 10px;
+  background-color: var(--white);
+  border-radius: 30px;
+  pointer-events: none;
+}
+
+.select {
+  color: var(--black);
+  padding: 9px 36px;
+  border-radius: 30px;
+  background-color: var(--yellow);
+  pointer-events: none;
+  position: absolute;
+  bottom: 30px;
+}
+
+#form-container {
   visibility: hidden;
   pointer-events: none;
   width: 100vw;
-  height: 100vw;
+  height: 100vh;
   opacity: 0;
   transition: .5s;
   transition-property: opacity;
   position: absolute;
-  background-color: #242424;
+  background-color: #FFFFFF;
   left: 0;
   top: 0;
-  height: 0;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -53,18 +122,68 @@ form {
   justify-content: center;
 }
 
+#leave {
+  color: white;
+  background-color: #FFC700;
+  border-radius: 43px;
+  padding: 13px 50px;
+  width: fit-content;
+  height: fit-content;
+  margin-bottom: 35px;
+  cursor: pointer;
+}
+
+form {
+  display: flex;
+ 
+}
+
+#mail {
+  background-color: grey;
+  border-radius: 43px;
+  padding: 9px 15px;
+}
+
 #mail:valid {
   background-color: green;
 }
 
-#leave {
-  position: absolute;
-  right: 5rem;
-  top: 5rem;
+#mail::placeholder {
+  color: var(--grey)
 }
 
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.form-content {
+  width: 765px;
+}
+
+.videoClone {
+  background-color: grey;
+}
+
+label {
+  Color: var(--black);
+
+}
+
+.mail-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  margin-left: 35px;
+}
+
+#submit {
+  color: white;
+  background-color: #FFC700;
+  border-radius: 43px;
+  padding: 9px 30px;
+  text-align: center;
+  width: fit-content;
+  cursor: pointer;
 }

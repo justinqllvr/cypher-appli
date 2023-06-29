@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cypher App</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cypher App</title>
-</head>
-
-<body>
-  <pre id="content" style="white-space: pre-wrap;"></pre>
-  <form id="form">
-    <div class="form-example">
-      <label for="email">Récupère ta vidéo par mail :</label>
-      <input id="mail" type="email" id="email" placeholder="john@exemple.com" required>
+  <body>
+    <pre id="content" style="white-space: pre-wrap"></pre>
+    <h1 class="title">
+      share your cypher
+      <img class="circle" src="./assets/images/entourer-blanc.png" alt="logo" />
+    </h1>
+    <div class="videos-container"></div>
+    <div id="form-container">
+      <div class="form-content">
+        <div id="leave">Retour</div>
+        <form id="form">
+          <div class="clone-container"></div>
+          <div class="mail-container">
+            <label for="mail">Récupère ta vidéo par mail :</label>
+            <input
+              id="mail"
+              type="email"
+              placeholder="john@exemple.com"
+              required
+            />
+            <input id="submit" type="submit" value="Envoyer !" />
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="form-example">
-      <input id="submit" type="submit" value="Envoyer !">
-    </div>
-    <button id="leave">Quitter</button>
-  </form>
-</body>
+  </body>
 
-<script type="module" src="/main.js"></script>
+  <script type="module" src="/main.js"></script>
 </html>

@@ -3,9 +3,10 @@ import { app } from "./main.js";
 export default class Video {
   constructor() {
     //HTML
-    this.bodyEl = document.querySelector("body");
+    this.videosEl = document.querySelector(".videos-container");
+    this.cloneContainerEl = document.querySelector(".clone-container");
     this.leaveEl = document.getElementById('leave')
-    this.formEl = document.getElementById('form')
+    this.formContainerEl = document.getElementById('form-container')
     this.submitButtonEl = document.getElementById('submit')
     this.mailInputEl = document.getElementById('mail')
 
@@ -36,6 +37,8 @@ export default class Video {
     const videoEl = document.createElement("video");
     videoEl.src = src;
     videoEl.controls = false;
+    videoEl.width = 250
+    videoEl.height = 450
     videoEl.addEventListener("click", (e) => {
       that.displayForm(e, id);
     });
@@ -44,11 +47,18 @@ export default class Video {
     container.classList.add("container");
 
     const idEl = document.createElement("span");
-    idEl.innerHTML = this.id;
+    idEl.classList.add('id')
+    idEl.innerHTML = 'ID ' + this.id;
 
-    this.bodyEl.appendChild(container);
+    const selectEl = document.createElement("div");
+    selectEl.classList.add('select')
+    selectEl.innerHTML = 'Sélectionner';
+
+
+    this.videosEl.appendChild(container);
     container.appendChild(videoEl);
     container.appendChild(idEl);
+    container.appendChild(selectEl);
   }
 
   displayForm(e, id) {
@@ -56,10 +66,11 @@ export default class Video {
     this.videoBuffer = this.videos.get(id)
 
     //Show form
-    this.show(this.formEl)
+    this.show(this.formContainerEl)
 
     //Resize video
-    this.formEl.appendChild(this.videoCloneEl)
+    this.videoCloneEl.classList.add('videoClone')
+    this.cloneContainerEl.appendChild(this.videoCloneEl);
     this.videoCloneEl.controls = true;
   }
 
@@ -70,21 +81,21 @@ export default class Video {
 
     app.server.sendMail(this.id, this.mailInputEl.value, this.videoBuffer)
 
-    this.hide(this.formEl)
+    this.hide(this.formContainerEl)
     this.videoCloneEl.remove()
 
   }
 
   leave(e) {
     e.preventDefault()
-    this.hide(this.formEl)
+    this.hide(this.formContainerEl)
     this.videoCloneEl.remove()
   }
 
   show(node) {
     node.style.visibility = 'visible';
     node.style.pointerEvents = 'all';
-    node.style.opacity = '1';
+    node.style.opacity = '.95';
     node.style.height = '100vh'
   }
 

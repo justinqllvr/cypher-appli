@@ -12,6 +12,7 @@ const mergeBuffers = (buffer1, buffer2) => {
 export default class Server {
   constructor() {
     this.connect();
+    this.ffmpeg = createFFmpeg({ log: true });
 
     this.bodyEl = document.querySelector("body");
     this.buffers = new Map();
@@ -33,8 +34,8 @@ export default class Server {
         length: Math.ceil(buffer.byteLength / 1_000_000),
         buffer: buffer.slice(i * 1_000_000, (i + 1) * 1_000_000),
         email: mail,
-      })
-		}
+      });
+    }
   }
 
   handleNewBuffer = async (video) => {
@@ -49,8 +50,7 @@ export default class Server {
 
     //Merge all buffers from servers to one single buffer
     const videoBuffer = this.mergeVideoBuffers(video.id);
-    app.video.displayVideo(videoBuffer, video.id)
-   
+    this.cropVideo(videoBuffer, video.id)
   };
 
   mergeVideoBuffers(id) {
@@ -61,5 +61,28 @@ export default class Server {
       .reduce((a, b) => mergeBuffers(a, b), new Uint8Array());
     this.buffers.delete(id);
     return mergedBuffer;
+  }
+
+  async cropVideo(videoBuffer, id) {
+    const cropWidth = 1080;
+    const cropHeight = 1920; 
+
+    if(!this.ffmpeg.isLoaded()) await this.ffmpeg.load();
+    
+
+    this.ffmpeg.FS("writeFile", "video1.mp4", new Uint8Array(videoBuffer))
+    // Cropping de la vidéo
+    await this.ffmpeg.run(
+        "-i",
+        "video1.mp4",
+        "-vf",
+        `crop=1/3.25*in_w:in_h`,
+        "output.mp4"
+      )
+
+      const croppedVideoBuffer = this.ffmpeg.FS("readFile", "output.mp4");
+      console.log(croppedVideoBuffer)
+      app.video.displayVideo(croppedVideoBuffer, id);
+      this.ffmpeg.FS("unlink", "output.mp4");
   }
 }
